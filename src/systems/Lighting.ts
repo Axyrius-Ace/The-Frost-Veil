@@ -25,6 +25,7 @@ export class Lighting {
   private segs: Seg[] = [];
   private near: Seg[] = [];
   private rays: { x: number; y: number; d: number }[] = [];
+  private frame = 0;
   lights: Light[] = [];
   ambient = 0.9;
   ambientColor = 0x02050e;
@@ -56,9 +57,13 @@ export class Lighting {
   }
 
   update(time: number) {
+    this.frame++;
     const cam = this.scene.cameras.main;
     const wv = cam.worldView;
-    this.near = this.segs.filter((s) => s.maxX > this.flash.x - this.flash.range && s.minX < this.flash.x + this.flash.range && s.maxY > this.flash.y - this.flash.range && s.minY < this.flash.y + this.flash.range);
+    // Rebuild the nearby occluder list only when the player has moved enough.
+    if (this.frame === 1 || this.frame % (this.mobileFallback ? 2 : 1) === 0) {
+      this.near = this.segs.filter((s) => s.maxX > this.flash.x - this.flash.range && s.minX < this.flash.x + this.flash.range && s.maxY > this.flash.y - this.flash.range && s.minY < this.flash.y + this.flash.range);
+    }
     for (const l of this.lights) {
       let k = l.intensity;
       if (l.flicker > 0) { if (l.dip <= 0 && Math.random() < l.flicker) l.dip = 3 + Math.floor(Math.random() * 12); if (l.dip > 0) { l.dip--; k *= 0.12 + Math.random() * 0.5; } else k *= 0.94 + Math.random() * 0.06; }
@@ -82,7 +87,7 @@ export class Lighting {
     if (this.flash.on && this.flash.power > 0.02) { this.cast(); this.mask.clear(); const layers: [number, number][] = [[1, 0.3], [0.8, 0.3], [0.58, 0.35], [0.34, 0.5]]; for (const [fr, a] of layers) { this.mask.fillStyle(0xffffff, a * this.flash.power); this.polygon(this.mask, fr); } this.rt.erase(this.mask, -ox, -oy); this.cone.fillStyle(0xfff1c9, 0.045 * this.flash.power); this.polygon(this.cone, 1); this.cone.fillStyle(0xfff1c9, 0.05 * this.flash.power); this.polygon(this.cone, 0.55); }
   }
 
-  private cast() { const f = this.flash; const n = this.mobileFallback ? 48 : 84; this.rays.length = 0; for (let i = 0; i <= n; i++) { const a = f.angle - f.half + (2 * f.half * i) / n; const dx = Math.cos(a), dy = Math.sin(a); let d = f.range; for (const s of this.near) { const t = raySeg(f.x, f.y, dx, dy, s); if (t !== null && t < d) d = t; } this.rays.push({ x: dx, y: dy, d }); } }
+  private cast() { const f = this.flash; const n = this.mobileFallback ? 32 : 84; this.rays.length = 0; for (let i = 0; i <= n; i++) { const a = f.angle - f.half + (2 * f.half * i) / n; const dx = Math.cos(a), dy = Math.sin(a); let d = f.range; for (const s of this.near) { const t = raySeg(f.x, f.y, dx, dy, s); if (t !== null && t < d) d = t; } this.rays.push({ x: dx, y: dy, d }); } }
   private polygon(g: Phaser.GameObjects.Graphics, fr: number) { const f = this.flash; const lim = f.range * fr; g.beginPath(); g.moveTo(f.x, f.y); for (const r of this.rays) { const d = Math.min(r.d, lim); g.lineTo(f.x + r.x * d, f.y + r.y * d); } g.closePath(); g.fillPath(); }
   isLit(x: number, y: number): number { const f = this.flash; if (!f.on || f.power < 0.05) return 0; const dx = x - f.x, dy = y - f.y; const d = Math.hypot(dx, dy); if (d > f.range * 0.95) return 0; if (d > 4) { const da = Math.abs(Phaser.Math.Angle.Wrap(Math.atan2(dy, dx) - f.angle)); if (da > f.half * 0.95) return 0; const ux = dx / d, uy = dy / d; for (const s of this.near) { const t = raySeg(f.x, f.y, ux, uy, s); if (t !== null && t < d - 1) return 0; } } return f.power * (1 - (d / f.range) * 0.4); }
 }
