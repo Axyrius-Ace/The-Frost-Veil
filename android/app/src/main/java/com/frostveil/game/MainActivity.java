@@ -2,14 +2,13 @@ package com.frostveil.game;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import com.getcapacitor.BridgeActivity;
 
-/**
- * Fullscreen immersion: hides the phone status bar (battery/wifi/icons) and
- * the system navigation buttons so only the game is visible. Swiping from a
- * screen edge temporarily reveals them (sticky immersion).
- */
+/** Keeps Android system bars out of the playable frame. */
 public class MainActivity extends BridgeActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +29,23 @@ public class MainActivity extends BridgeActivity {
   }
 
   private void hideSystemUI() {
-    if (getWindow() == null) return;
-    getWindow().setFlags(
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-    View decor = getWindow().getDecorView();
+    Window window = getWindow();
+    if (window == null) return;
+    window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    window.setStatusBarColor(0x00000000);
+    window.setNavigationBarColor(0x00000000);
+    window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+    View decor = window.getDecorView();
     if (decor == null) return;
+
+    if (android.os.Build.VERSION.SDK_INT >= 30) {
+      WindowInsetsController controller = decor.getWindowInsetsController();
+      if (controller != null) {
+        controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars() | WindowInsets.Type.displayCutout());
+        controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+      }
+    }
+
     decor.setSystemUiVisibility(
       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
       | View.SYSTEM_UI_FLAG_FULLSCREEN
