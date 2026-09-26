@@ -24,10 +24,20 @@ export function TouchControls() {
   // Lazily detected on first render so the stick exists when listeners attach.
   const [visible] = useState(detectTouch);
   const s = useGame();
+  const playing = s.mode === 'playing';
 
   useEffect(() => {
     touchState.run = run;
   }, [run]);
+
+  // Clear any stuck direction when leaving the game view.
+  useEffect(() => {
+    if (!playing) {
+      touchId.current = null;
+      setMove(0, 0);
+      if (stickRef.current) stickRef.current.style.transform = 'translate(0px, 0px)';
+    }
+  }, [playing]);
 
   useEffect(() => {
     const base = baseRef.current;
@@ -44,6 +54,8 @@ export function TouchControls() {
         dx /= len;
         dy /= len;
       }
+      // Dead zone so a resting thumb doesn't drift the detective.
+      if (Math.hypot(dx, dy) < 0.18) { dx = 0; dy = 0; }
       setMove(dx, dy);
       if (stickRef.current) {
         stickRef.current.style.transform = `translate(${dx * STICK_R * 0.6}px, ${dy * STICK_R * 0.6}px)`;
@@ -57,6 +69,8 @@ export function TouchControls() {
     };
 
     const onTouchStart = (e: TouchEvent) => {
+      // Ignore a second finger on the stick; the first one steers.
+      if (touchId.current !== null) return;
       const t = e.changedTouches[0];
       touchId.current = t.identifier;
       handleMove(t);
@@ -85,12 +99,17 @@ export function TouchControls() {
       base.removeEventListener('touchmove', onTouchMove);
       base.removeEventListener('touchend', onTouchEnd);
       base.removeEventListener('touchcancel', onTouchEnd);
+      // Never leave a stuck direction behind when the stick unmounts.
+      touchId.current = null;
+      setMove(0, 0);
     };
-  }, [visible]);
+    // Re-attach when the stick (un)mounts: it only exists in 'playing' mode,
+    // so depending on `playing` is what makes the listeners actually attach.
+  }, [visible, playing]);
 
   if (!visible) return null;
 
-  if (s.mode !== 'playing') return null;
+  if (!playing) return null;
 
   return (
     <div className="touch-ui">

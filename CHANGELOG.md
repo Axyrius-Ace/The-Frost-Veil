@@ -5,6 +5,12 @@ Every released version appears in the GitHub **Releases** list
 
 ## Unreleased (on `main`)
 - Next development.
+- Fix: virtual joystick listeners now attach when entering play mode (the
+  stick was visible but dead, so the player couldn't move on touch devices),
+  plus stick dead zone and second-finger guard.
+- Landscape: browser version requests landscape lock on game start and shows
+  a "rotate your phone" hint in portrait (the APK was already locked via
+  AndroidManifest).
 
 ## v3.0 — V3
 - Everything from V2 (touch joystick, landscape/rotation handling, Android build).

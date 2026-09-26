@@ -254,6 +254,8 @@ kbd { font-family: var(--pixel); font-size: 9px; padding: 3px 5px 2px; margin: 0
 .touch-btn.active { background: rgba(255,181,77,0.35); border-color: var(--warm); }
 .touch-top { position: absolute; top: max(64px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); display: flex; gap: 8px; pointer-events: auto; }
 .touch-chip { width: 46px; height: 46px; border-radius: 10px; border: 1px solid var(--edge); background: rgba(8,14,28,0.6); font-size: 20px; touch-action: none; }
+.rotate-hint { position: absolute; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 60; padding: 8px 18px; background: rgba(8,14,28,0.85); border: 1px solid var(--warm); border-radius: 20px; font-family: var(--pixel); font-size: 11px; color: #ffe2b0; white-space: nowrap; animation: hintPulse 1.6s ease-in-out infinite; }
+@keyframes hintPulse { 50% { opacity: 0.55; } }
 @media (pointer: coarse) {
   .hud-br { display: none; }
   .hud-prompt { bottom: 34%; font-size: 20px; }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame, resetState, setMode } from '../systems/store';
 import { hasSave, loadGame, saveMeta, SLOTS, unlockedEndings, formatTime, Slot } from '../systems/save';
 import { EventBus, EV } from '../systems/EventBus';
+import { lockLandscape } from '../systems/orientation';
 import { audio } from '../systems/audio';
 import { ENDINGS, ENDING_IDS } from '../data/endings';
 
@@ -11,8 +12,8 @@ export function TitleMenu() {
   const canContinue = hasSave('auto');
   const unlocked = unlockedEndings();
 
-  const newGame = () => { audio.init(); audio.click(); resetState(); EventBus.emit(EV.START_GAME); setMode('intro'); };
-  const load = (slot: Slot) => { audio.init(); if (loadGame(slot)) EventBus.emit(EV.START_GAME); };
+  const newGame = () => { audio.init(); audio.click(); lockLandscape(); resetState(); EventBus.emit(EV.START_GAME); setMode('intro'); };
+  const load = (slot: Slot) => { audio.init(); lockLandscape(); if (loadGame(slot)) EventBus.emit(EV.START_GAME); };
 
   return (
     <div className="title-screen">
@@ -60,6 +61,7 @@ export function ControlsList() {
   const rows: [string, string][] = [
     ['WASD / Arrows', 'Walk'], ['Shift', 'Run'], ['Mouse', 'Aim flashlight'], ['F / Right-click', 'Flashlight on/off'],
     ['E', 'Examine / Talk / Enter'], ['J / Tab', 'Detective notebook'], ['B', 'Investigation board'], ['Esc / P', 'Pause menu'], ['M', 'Mute'],
+    ['Left stick (touch)', 'Walk · push far to run'], ['E button (touch)', 'Examine / Talk / Enter'],
   ];
   return <div className="controls-list">{rows.map(([k, v]) => <div key={k}><kbd>{k}</kbd><span>{v}</span></div>)}</div>;
 }

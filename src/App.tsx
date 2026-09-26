@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type Phaser from 'phaser';
 import { createGame } from './scenes/createGame';
 import { useGame, getState, setMode, setState } from './systems/store';
+import { isTouchDevice } from './systems/orientation';
 import { audio } from './systems/audio';
 import { HUD } from './components/HUD';
 import { TitleMenu } from './components/TitleMenu';
@@ -17,6 +18,22 @@ import { Toasts } from './components/Toasts';
 import { TouchControls } from './components/TouchControls';
 
 let game: Phaser.Game | null = null;
+
+/** "Rotate your phone" banner: shown while playing in portrait on touch devices. */
+function RotateHint({ inGame }: { inGame: boolean }) {
+  const [touch] = useState(isTouchDevice);
+  const [portrait, setPortrait] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(orientation: portrait)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)');
+    const onChange = () => setPortrait(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  if (!touch || !portrait || !inGame) return null;
+  return <div className="rotate-hint">🔄 Rotate your phone sideways to play</div>;
+}
 
 export default function App() {
   const s = useGame();
@@ -65,6 +82,7 @@ export default function App() {
       {s.mode === 'ending' && <EndingScreen />}
       <Toasts />
       <TouchControls />
+      <RotateHint inGame={inGame} />
     </div>
   );
 }
