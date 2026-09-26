@@ -1,59 +1,10 @@
 export interface CharacterNote { flag?: string; evidence?: string; deduction?: string; text: string }
-export interface Character {
-  id: string;
-  name: string;
-  role: string;
-  suspect: boolean;
-  bio: string;
-  notes: CharacterNote[];
-}
-
+export interface Character { id: string; name: string; role: string; suspect: boolean; bio: string; notes: CharacterNote[] }
 export const CHARACTERS: Record<string, Character> = {
-  halvorsen: {
-    id: 'halvorsen', name: 'Sheriff Aksel Halvorsen', role: 'Town sheriff', suspect: false,
-    bio: 'Sixty-one, bad knees, thirty winters wearing the badge. The only person in Hollowpine who asked for outside help.',
-    notes: [
-      { flag: 'sheriff_needle', text: 'Brandt examined the body and never mentioned the needle mark.' },
-    ],
-  },
-  brandt: {
-    id: 'brandt', name: 'Dr. Ilse Brandt', role: 'Town physician', suspect: true,
-    bio: "Hollowpine's only doctor for fifteen years. Pronounced Mara's death 'exposure' in four minutes.",
-    notes: [
-      { flag: 'brandt_alibi', text: 'Claims she was alone at the clinic all night. No witnesses.' },
-      { flag: 'brandt_lied_visit', text: 'Hid that Mara visited her at nine o\'clock.' },
-      { flag: 'brandt_blames_jonah', text: 'Deflected the missing Morphenol onto Jonah.' },
-      { flag: 'jonah_key', text: 'Wears the only key to the drug cabinet around her neck.' },
-      { flag: 'brandt_lied_boots', text: 'Said the boots were old. They were still dripping.' },
-    ],
-  },
-  henrik: {
-    id: 'henrik', name: 'Henrik Voss', role: 'Innkeeper, The Last Lantern', suspect: true,
-    bio: 'Blunt, unfriendly, and loudly unbothered. Argued with Mara a week before her death.',
-    notes: [
-      { flag: 'met_henrik', text: "Admits he didn't like Mara." },
-      { flag: 'lantern_seen', text: 'Saw a small figure with a lantern heading for the square around 23:30.' },
-      { deduction: 'henrik_clear', text: 'ALIBI CONFIRMED: serving six witnesses at the time of death.' },
-    ],
-  },
-  oskar: {
-    id: 'oskar', name: 'Oskar Linden', role: "The victim's brother", suspect: true,
-    bio: 'Unemployed since the mine closed. Drinks on credit. The town has already decided it was him.',
-    notes: [
-      { flag: 'mara_saw_doctor', text: 'Says Mara left his room at nine to see Dr. Brandt.' },
-      { flag: 'oskar_debt_forgiven', text: 'Says Mara forgave his 300-crown debt on Sunday.' },
-      { flag: 'oskar_scarf_explained', text: 'Gave Mara his scarf on Tuesday when her coat tore.' },
-      { flag: 'henrik_scarf', text: 'Henrik independently confirms the scarf was a gift.' },
-    ],
-  },
-  jonah: {
-    id: 'jonah', name: 'Jonah Kell', role: 'Snowplow driver', suspect: true,
-    bio: 'Nineteen. Drives the council plow all night. Found the body at 00:45 and has not stopped shaking since.',
-    notes: [
-      { flag: 'jonah_route', text: 'Cleared the square at 23:30. Nobody was there.' },
-      { evidence: 'plow_log', text: 'Handed over his route log without hesitation.' },
-    ],
-  },
+  halvorsen: { id:'halvorsen', name:'کلانتر اکسل هالوورسن', role:'کلانتر شهر', suspect:false, bio:'شصت‌ویک ساله، زانوهای خراب و سی سال زمستان با نشان کلانتری. تنها آدم شهر که دنبال کمک از بیرون گشت.', notes:[{flag:'sheriff_needle',text:'برانت جسد را معاینه کرد، اما حتی یک کلمه هم از جای سوزن نگفت.'}] },
+  brandt: { id:'brandt', name:'دکتر ایلزه برانت', role:'پزشک شهر', suspect:true, bio:'پانزده سال است تنها پزشک هالوپاین است. مرگ مارا را در چهار دقیقه «سرمازدگی» اعلام کرد.', notes:[{flag:'brandt_alibi',text:'می‌گوید تمام شب در درمانگاه تنها بوده؛ هیچ شاهدی ندارد.'},{flag:'brandt_lied_visit',text:'اول پنهان کرد که مارا ساعت نه شب به دیدنش آمده.'},{flag:'brandt_blames_jonah',text:'گم‌شدن مورفِنول را گردن جونا انداخت.'},{flag:'jonah_key',text:'تنها کلید کمد داروها را به گردنش می‌اندازد.'},{flag:'brandt_lied_boots',text:'گفت چکمه‌ها قدیمی‌اند؛ هنوز ازشان آب می‌چکید.'}] },
+  henrik: { id:'henrik', name:'هنریک وُس', role:'صاحب مهمانخانه آخرین فانوس', suspect:true, bio:'تندخو، بدعنق و زیادی خونسرد. یک هفته قبل از مرگ مارا با او دعوا کرده بود.', notes:[{flag:'met_henrik',text:'قبول دارد که از مارا خوشش نمی‌آمد.'},{flag:'lantern_seen',text:'حدود یازده‌ونیم، آدمی ریزنقش را با فانوس دید که به سمت میدان می‌رفت.'},{deduction:'henrik_clear',text:'آلیبی تأیید شد: هنگام مرگ، شش شاهد مهمانخانه را ترک نکرده‌اند.'}] },
+  oskar: { id:'oskar', name:'اسکار لیندن', role:'برادر مقتول', suspect:true, bio:'از وقتی معدن تعطیل شده بیکار است. نسیه می‌نوشد و شهر از قبل تصمیم گرفته قاتل اوست.', notes:[{flag:'mara_saw_doctor',text:'می‌گوید مارا ساعت نه از اتاقش رفت تا دکتر برانت را ببیند.'},{flag:'oskar_debt_forgiven',text:'می‌گوید مارا یکشنبه بدهی سیصد کرونی‌اش را بخشیده بود.'},{flag:'oskar_scarf_explained',text:'سه‌شنبه، وقتی پالتوی مارا پاره شد، شالش را به او داد.'},{flag:'henrik_scarf',text:'هنریک هم مستقل تأیید کرد که شال هدیه بوده.'}] },
+  jonah: { id:'jonah', name:'جونا کِل', role:'راننده برف‌روب', suspect:true, bio:'نوزده ساله است. تمام شب با برف‌روب شورا رانندگی می‌کند و بعد از پیدا کردن جسد، هنوز دست‌هایش می‌لرزد.', notes:[{flag:'jonah_route',text:'ساعت یازده‌ونیم میدان را پاک کرده؛ آن موقع هیچ‌کس آنجا نبوده.'},{evidence:'plow_log',text:'دفتر مسیرش را بی‌معطلی تحویل داد.'}] }
 };
-
-export const SUSPECT_IDS = ['brandt', 'henrik', 'oskar', 'jonah'];
+export const SUSPECT_IDS = ['brandt','henrik','oskar','jonah'];

@@ -1,61 +1,10 @@
-export interface Ending {
-  id: string;
-  title: string;
-  subtitle: string;
-  tone: 'true' | 'bitter' | 'wrong' | 'neutral';
-  paragraphs: string[];
-}
-
-export const ENDINGS: Record<string, Ending> = {
-  true_thaw: {
-    id: 'true_thaw', title: 'The Thaw', subtitle: 'True Ending', tone: 'true',
-    paragraphs: [
-      'You lay it out on the clinic desk: the needle mark, the missing Morphenol, the boots still weeping meltwater onto the floorboards, and a page of last winter\'s register initialed I.B.',
-      'Doctor Ilse Brandt listens without interrupting, the way she must have listened to three dying patients. "They were suffering," she says at last. "The fever would have taken them. I only made it quiet." Then, softer: "Mara wanted to make it loud."',
-      'Halvorsen lifts the cabinet key from around her neck. Outside, for the first time in eleven days, the wind drops.',
-      'By morning the snow has stopped. The road opens at noon. You ride down the mountain in Jonah\'s plow, and behind you the church bell rings for Mara Linden, clear across the valley.',
-    ],
-  },
-  thin_ice: {
-    id: 'thin_ice', title: 'Thin Ice', subtitle: 'Bitter Ending', tone: 'bitter',
-    paragraphs: [
-      'You name her. Doctor Brandt laughs, tired and almost kind. "Detective, you have a hunch and a snowstorm."',
-      'She is right. With half the picture, the valley magistrate releases her in the spring, citing insufficient evidence. The town apologizes to her with a cake.',
-      'Three weeks later a traveler at the Last Lantern falls asleep in a snowdrift and never wakes up. The certificate reads "exposure," in a neat, familiar hand.',
-    ],
-  },
-  wrong_oskar: {
-    id: 'wrong_oskar', title: 'Cold Blood', subtitle: 'Wrong Accusation', tone: 'wrong',
-    paragraphs: [
-      'The scarf, the debt, the drinking. It is the story Hollowpine already wanted, and Oskar is too broken to argue with it.',
-      'In the valley jail he stops eating. Doctor Brandt is called to examine him, and she is very gentle.',
-      'In April the snow melts off the church roof and a torn letter to the magistrate is finally found. By then it is addressed to no one.',
-    ],
-  },
-  wrong_henrik: {
-    id: 'wrong_henrik', title: 'Bitter Draught', subtitle: 'Wrong Accusation', tone: 'wrong',
-    paragraphs: [
-      'Henrik doesn\'t even stand up. "Six people watched me pour aquavit all night, you fool."',
-      'Six people say so under oath. The case collapses in a week, and so does your reputation.',
-      'A bottle arrives at your valley office with a note: "For the cold. - I.B." You never open it. You never quite know why.',
-    ],
-  },
-  wrong_jonah: {
-    id: 'wrong_jonah', title: 'Snowblind', subtitle: 'Wrong Accusation', tone: 'wrong',
-    paragraphs: [
-      'He is nineteen. He cries the whole way down the mountain, and keeps saying he only turned on his headlights.',
-      'The town is relieved to have an answer that isn\'t one of their own. Doctor Brandt sits with his mother at the trial and holds her hand.',
-      'The plow sits unused all winter. The roads stay buried. Nobody leaves Hollowpine for a long, long time.',
-    ],
-  },
-  whiteout: {
-    id: 'whiteout', title: 'Whiteout', subtitle: 'Unsolved', tone: 'neutral',
-    paragraphs: [
-      'You tell Halvorsen you\'ll send someone up from the valley. You both know no one will come.',
-      'The chained bus crawls down the switchbacks. Behind you, Hollowpine dissolves into white, one lamp at a time.',
-      'Mara Linden is filed under "exposure." The snow keeps falling. It always will.',
-    ],
-  },
+export interface Ending { id:string; title:string; subtitle:string; tone:'true'|'bitter'|'wrong'|'neutral'; paragraphs:string[] }
+export const ENDINGS: Record<string,Ending> = {
+ true_thaw:{id:'true_thaw',title:'آب‌شدن یخ',subtitle:'پایان واقعی',tone:'true',paragraphs:['همه‌چیز را روی میز درمانگاه می‌چینی: جای سوزن، مورفِنول گمشده، چکمه‌هایی که هنوز آب روی کف می‌چکانند و صفحه‌ای از دفتر زمستان قبل با حروف اول «ا.ب».','دکتر ایلزه برانت بی‌وقفه گوش می‌دهد؛ همان‌طور که لابد به نفس‌های سه بیمار در حال مرگ گوش داده بود. بالاخره می‌گوید: «داشتند عذاب می‌کشیدند. تب کارشان را تمام می‌کرد. من فقط کاری کردم آرام شود.» بعد آرام‌تر اضافه می‌کند: «مارا می‌خواست همه‌چیز را فریاد بزند.»','هالوورسن کلید کمد را از دور گردنش باز می‌کند. بیرون، برای اولین بار در یازده روز، باد می‌خوابد.','صبح برف بند می‌آید. جاده ظهر باز می‌شود. با برف‌روب جونا از کوه پایین می‌روی و ناقوس کلیسا پشت سرت برای مارا لیندن در تمام دره زنگ می‌زند.']},
+ thin_ice:{id:'thin_ice',title:'یخ نازک',subtitle:'پایان تلخ',tone:'bitter',paragraphs:['اسمش را می‌آوری. دکتر برانت خسته و تقریباً مهربان می‌خندد: «کارآگاه، تو فقط یک حدس داری و یک کولاک.»','حق با اوست. با نصف حقیقت، قاضی دره بهار آزادش می‌کند؛ مدرک کافی نیست. شهر هم با یک کیک از او عذر می‌خواهد.','سه هفته بعد، مسافری در مهمانخانه آخرین فانوس روی برف خوابش می‌برد و دیگر بیدار نمی‌شود. روی گواهی مرگ نوشته‌اند: «سرمازدگی»، با همان دست‌خط مرتب و آشنا.']},
+ wrong_oskar:{id:'wrong_oskar',title:'خون سرد',subtitle:'اتهام اشتباه',tone:'wrong',paragraphs:['شال، بدهی، مشروب. همان داستانی است که هالوپاین از قبل می‌خواست باور کند و اسکار آن‌قدر شکسته است که توان دفاع از خودش را ندارد.','در زندان دره غذا خوردن را کنار می‌گذارد. دکتر برانت برای معاینه‌اش می‌آید و با او خیلی مهربان است.','آوریل که برف از سقف کلیسا آب می‌شود، نامه‌ای پاره به قاضی پیدا می‌کنند. آن موقع دیگر نامه خطاب به هیچ‌کس نیست.']},
+ wrong_henrik:{id:'wrong_henrik',title:'جرعه تلخ',subtitle:'اتهام اشتباه',tone:'wrong',paragraphs:['هنریک حتی از جایش بلند نمی‌شود: «شش نفر تمام شب دیدند داشتم آکواویت می‌ریختم، احمق.»','شش نفر همین را زیر سوگند تأیید می‌کنند. پرونده یک هفته‌ای فرو می‌ریزد و آبروی تو هم همراهش.','بطری‌ای به دفترت در دره می‌رسد با یادداشتی: «برای سرما. ا.ب.» بازش نمی‌کنی. خودت هم دقیق نمی‌فهمی چرا.']},
+ wrong_jonah:{id:'wrong_jonah',title:'برف‌کوری',subtitle:'اتهام اشتباه',tone:'wrong',paragraphs:['نوزده سالش است. تمام راه پایین کوه گریه می‌کند و مدام می‌گوید فقط چراغ‌های برف‌روب را روشن کرده بود.','شهر خیالش راحت می‌شود که جواب، یکی از خودشان نیست. دکتر برانت سر دادگاه کنار مادر جونا می‌نشیند و دستش را می‌گیرد.','برف‌روب تمام زمستان بی‌استفاده می‌ماند. جاده‌ها دفن می‌شوند و مدت خیلی خیلی زیادی، هیچ‌کس از هالوپاین بیرون نمی‌رود.']},
+ whiteout:{id:'whiteout',title:'سفیدپوش',subtitle:'پرونده حل‌نشده',tone:'neutral',paragraphs:['به هالوورسن می‌گویی از دره نیرو می‌فرستی. هر دوتان می‌دانید کسی نمی‌آید.','اتوبوس زنجیری از پیچ‌های کوه پایین می‌خزد. پشت سرت، هالوپاین کم‌کم در سفیدی حل می‌شود؛ فانوس به فانوس.','نام مارا لیندن زیر عنوان «سرمازدگی» ثبت می‌شود. برف ادامه دارد. همیشه همین‌طور خواهد بود.']}
 };
-
 export const ENDING_IDS = Object.keys(ENDINGS);
