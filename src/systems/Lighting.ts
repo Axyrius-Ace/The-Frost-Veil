@@ -3,10 +3,9 @@ import { DEPTH } from './constants';
 
 /**
  * Darkness + dynamic lighting.
- * A camera-sized RenderTexture is filled with night each frame, then light is "erased" out of it:
- *  - static lights (lamps, windows, fireplaces) are soft radial stamps with flicker/blink
- *  - the flashlight is a ray-cast visibility cone clipped against wall segments, giving real shadows
- * Additive glow sprites add warm colour on top of the darkness.
+ * Desktop keeps the full RenderTexture lighting pass. Android/WebView devices
+ * use a safe fallback: the old camera-sized RenderTexture could be composited
+ * as a partial black rectangle after a resize/orientation change.
  */
 export interface Seg { x1: number; y1: number; x2: number; y2: number; minX: number; minY: number; maxX: number; maxY: number }
 export interface Light {
@@ -31,6 +30,7 @@ export class Lighting {
   private rt: Phaser.GameObjects.RenderTexture;
   private mask: Phaser.GameObjects.Graphics;
   private cone: Phaser.GameObjects.Graphics;
+  private mobileFallback: boolean;
   private segs: Seg[] = [];
   private near: Seg[] = [];
   private rays: { x: number; y: number; d: number }[] = [];
@@ -42,7 +42,11 @@ export class Lighting {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
+    this.mobileFallback = typeof window !== 'undefined' && (
+      navigator.maxTouchPoints > 0 || window.matchMedia?.('(pointer: coarse)').matches
+    );
     this.rt = scene.add.renderTexture(0, 0, 640, 400).setOrigin(0, 0).setDepth(DEPTH.DARK);
+    this.rt.setVisible(!this.mobileFallback);
     this.mask = scene.make.graphics({ x: 0, y: 0 }, false);
     this.cone = scene.add.graphics().setDepth(DEPTH.GLOW).setBlendMode(Phaser.BlendModes.ADD);
   }
@@ -68,14 +72,9 @@ export class Lighting {
   update(time: number) {
     const cam = this.scene.cameras.main;
     const wv = cam.worldView;
-    const w = Math.ceil(wv.width) + 4, h = Math.ceil(wv.height) + 4;
-    if (Math.abs(this.rt.width - w) > 1 || Math.abs(this.rt.height - h) > 1) this.rt.resize(w, h);
-    const ox = Math.floor(wv.x) - 2, oy = Math.floor(wv.y) - 2;
-    this.rt.setPosition(ox, oy);
-    this.rt.clear();
-    this.rt.fill(this.ambientColor, this.ambient);
+    this.near = this.segs.filter((s) => s.maxX > this.flash.x - this.flash.range && s.minX < this.flash.x + this.flash.range && s.maxY > this.flash.y - this.flash.range && s.minY < this.flash.y + this.flash.range);
 
-    // Static lights
+    // Still animate glows on Android, but never touch the unstable RT path.
     for (const l of this.lights) {
       let k = l.intensity;
       if (l.flicker > 0) {
@@ -88,30 +87,44 @@ export class Lighting {
       }
       l.cur = k;
       l.glow.setAlpha(0.15 * k);
-      if (l.x + l.radius < wv.x || l.x - l.radius > wv.right || l.y + l.radius < wv.y || l.y - l.radius > wv.bottom) continue;
-      this.rt.stamp('light', undefined, l.x - ox, l.y - oy, { scale: l.radius / 64, alpha: Math.min(1, k), erase: true });
     }
 
-    // Small personal aura so the detective is never fully invisible
-    this.rt.stamp('light', undefined, this.aura.x - ox, this.aura.y - oy, { scale: this.aura.radius / 64, alpha: this.aura.alpha, erase: true });
-
-    // Flashlight cone with ray-cast shadows
-    const f = this.flash;
     this.cone.clear();
-    this.near = this.segs.filter((s) => s.maxX > f.x - f.range && s.minX < f.x + f.range && s.maxY > f.y - f.range && s.minY < f.y + f.range);
-    if (f.on && f.power > 0.02) {
+    if (this.mobileFallback) {
+      if (this.flash.on && this.flash.power > 0.02) {
+        this.cast();
+        this.cone.fillStyle(0xfff1c9, 0.07 * this.flash.power);
+        this.polygon(this.cone, 1);
+        this.cone.fillStyle(0xfff1c9, 0.06 * this.flash.power);
+        this.polygon(this.cone, 0.55);
+      }
+      return;
+    }
+
+    const w = Math.ceil(wv.width) + 4, h = Math.ceil(wv.height) + 4;
+    if (Math.abs(this.rt.width - w) > 1 || Math.abs(this.rt.height - h) > 1) this.rt.resize(w, h);
+    const ox = Math.floor(wv.x) - 2, oy = Math.floor(wv.y) - 2;
+    this.rt.setPosition(ox, oy);
+    this.rt.clear();
+    this.rt.fill(this.ambientColor, this.ambient);
+    for (const l of this.lights) {
+      if (l.x + l.radius < wv.x || l.x - l.radius > wv.right || l.y + l.radius < wv.y || l.y - l.radius > wv.bottom) continue;
+      this.rt.stamp('light', undefined, l.x - ox, l.y - oy, { scale: l.radius / 64, alpha: Math.min(1, l.cur), erase: true });
+    }
+    this.rt.stamp('light', undefined, this.aura.x - ox, this.aura.y - oy, { scale: this.aura.radius / 64, alpha: this.aura.alpha, erase: true });
+    if (this.flash.on && this.flash.power > 0.02) {
       this.cast();
       this.mask.clear();
       const layers: [number, number][] = [[1, 0.3], [0.8, 0.3], [0.58, 0.35], [0.34, 0.5]];
-      for (const [fr, a] of layers) { this.mask.fillStyle(0xffffff, a * f.power); this.polygon(this.mask, fr); }
+      for (const [fr, a] of layers) { this.mask.fillStyle(0xffffff, a * this.flash.power); this.polygon(this.mask, fr); }
       this.rt.erase(this.mask, -ox, -oy);
-      this.cone.fillStyle(0xfff1c9, 0.045 * f.power); this.polygon(this.cone, 1);
-      this.cone.fillStyle(0xfff1c9, 0.05 * f.power); this.polygon(this.cone, 0.55);
+      this.cone.fillStyle(0xfff1c9, 0.045 * this.flash.power); this.polygon(this.cone, 1);
+      this.cone.fillStyle(0xfff1c9, 0.05 * this.flash.power); this.polygon(this.cone, 0.55);
     }
   }
 
   private cast() {
-    const f = this.flash; const n = 84; this.rays.length = 0;
+    const f = this.flash; const n = this.mobileFallback ? 48 : 84; this.rays.length = 0;
     for (let i = 0; i <= n; i++) {
       const a = f.angle - f.half + (2 * f.half * i) / n;
       const dx = Math.cos(a), dy = Math.sin(a);
@@ -128,7 +141,6 @@ export class Lighting {
     g.closePath(); g.fillPath();
   }
 
-  /** 0..1 how strongly a world point is hit by the flashlight beam (with occlusion). */
   isLit(x: number, y: number): number {
     const f = this.flash;
     if (!f.on || f.power < 0.05) return 0;
