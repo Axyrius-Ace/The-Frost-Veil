@@ -1,24 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import { setMove, queueInteract, queueFlash, touchState } from '../systems/touch';
-import { setMode, getState } from '../systems/store';
+import { setMode, useGame } from '../systems/store';
 import { audio } from '../systems/audio';
 
 const STICK_R = 52;
+
+function detectTouch(): boolean {
+  if (typeof window === 'undefined') return false;
+  if ('ontouchstart' in window) return true;
+  if (navigator.maxTouchPoints > 0) return true;
+  try {
+    return window.matchMedia('(pointer: coarse)').matches;
+  } catch {
+    return false;
+  }
+}
 
 export function TouchControls() {
   const baseRef = useRef<HTMLDivElement>(null);
   const stickRef = useRef<HTMLDivElement>(null);
   const touchId = useRef<number | null>(null);
   const [run, setRun] = useState(false);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const coarse =
-      'ontouchstart' in window ||
-      navigator.maxTouchPoints > 0 ||
-      window.matchMedia?.('(pointer: coarse)').matches;
-    setVisible(coarse);
-  }, []);
+  // Lazily detected on first render so the stick exists when listeners attach.
+  const [visible] = useState(detectTouch);
+  const s = useGame();
 
   useEffect(() => {
     touchState.run = run;
@@ -81,12 +86,11 @@ export function TouchControls() {
       base.removeEventListener('touchend', onTouchEnd);
       base.removeEventListener('touchcancel', onTouchEnd);
     };
-  }, []);
+  }, [visible]);
 
   if (!visible) return null;
 
-  const st = getState();
-  if (st.mode !== 'playing') return null;
+  if (s.mode !== 'playing') return null;
 
   return (
     <div className="touch-ui">
