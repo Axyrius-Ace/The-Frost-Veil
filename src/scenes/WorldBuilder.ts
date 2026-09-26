@@ -133,7 +133,8 @@ export function buildWorld(sc: GameScene) {
     ];
     walls.forEach(([x, y, w, h], i) => { sc.addWall(x, y, w, h); if (i < 5) L.addOccluder(x, y, w, h); });
     L.addLight({ x: cx, y: b.y + b.h + 4, radius: 40, intensity: 0.35, color: 0x6a8ad0 });
-    sc.exits.push({ x1: cx - gap, x2: cx + gap, y: b.y + b.h - 3, to: 'town', tx: a.exit!.x, ty: a.exit!.y });
+    // Leave through the door with E (like every other door) — never auto-teleport.
+    sc.addInteractable({ id: `exit-${a.id}`, x: cx, y: b.y + b.h - 2, r: 18, label: 'Step outside', action: () => sc.travel('town', a.exit!.x, a.exit!.y, 'down') });
   }
   for (const f of FURNITURE) {
     const b = AREAS[f.area].bounds; const x = b.x + f.x, y = b.y + f.y;

@@ -17,8 +17,6 @@ export interface Interactable {
   sprite?: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
   action: () => void;
 }
-interface Exit { x1: number; x2: number; y: number; to: string; tx: number; ty: number }
-
 const FACING_ANGLE: Record<Facing, number> = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 
 export class GameScene extends Phaser.Scene {
@@ -28,7 +26,6 @@ export class GameScene extends Phaser.Scene {
   walls!: Phaser.Physics.Arcade.StaticGroup;
   interactables: Interactable[] = [];
   hiddenDecals: Phaser.GameObjects.Image[] = [];
-  exits: Exit[] = [];
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private facing: Facing = 'down';
   private aim = Math.PI / 2;
@@ -48,7 +45,7 @@ export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
 
   create() {
-    this.interactables = []; this.hiddenDecals = []; this.exits = []; this.steps = []; this.transitioning = false;
+    this.interactables = []; this.hiddenDecals = []; this.steps = []; this.transitioning = false;
     const s = getState();
     this.battery = s.battery; this.batterySynced = s.battery; this.flashOn = s.flashlightOn && s.battery > 0;
     this.cameras.main.setBackgroundColor('#010208');
@@ -295,12 +292,8 @@ export class GameScene extends Phaser.Scene {
     const prompt = best ? best.label : null;
     if (prompt !== this.lastPrompt) { this.lastPrompt = prompt; setState({ prompt }); }
     if (playing && best && (Phaser.Input.Keyboard.JustDown(k.interact) || consumeInteract()) && performance.now() - s.modeChangedAt > 250) best.action();
+    // Drain stale presses made while a menu was open so they never fire later.
     else if (!playing) { Phaser.Input.Keyboard.JustDown(k.interact); consumeInteract(); consumeFlash(); }
-
-    // Walk out of interior doorways
-    if (playing) for (const e of this.exits) {
-      if (this.player.y >= e.y && this.player.x > e.x1 && this.player.x < e.x2) { this.travel(e.to, e.tx, e.ty, 'down'); break; }
-    }
 
     // Footsteps + prints
     if (moving && playing) {

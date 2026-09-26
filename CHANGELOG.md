@@ -5,14 +5,6 @@ Every released version appears in the GitHub **Releases** list
 
 ## Unreleased (on `main`)
 - Next development.
-- Night pass: deeper darkness outdoors, dimmer lamp pools/glows, smaller
-  flashlight aura, calmer snow/fog above the darkness, moonlit ground.
-- Interiors get a dark surround (no raw black void frame); phone vignette
-  softened and quest HUD compacted on small screens.
-- Phone navigation: modals scroll, pause menu fits the screen, all menu and
-  back buttons are finger-sized.
-- Android fullscreen immersion: status bar and nav buttons hidden (swipe
-  from an edge to reveal), notch edge-to-edge.
 
 ## v2.0 — V2
 - Virtual joystick (listeners attach on entering play mode, dead zone,
@@ -21,6 +13,16 @@ Every released version appears in the GitHub **Releases** list
   a "rotate your phone" hint in portrait; APK locked via AndroidManifest.
 - Flashlight beam rendered from the post-physics player position, faster
   beam tracking while moving, touch aim only while the finger is down.
+- Leaving buildings now needs E like every other door — walking over the
+  doorway no longer auto-teleports you outside.
+- Night pass: deeper darkness outdoors, dimmer lamp pools/glows, smaller
+  flashlight aura, calmer snow/fog above the darkness, moonlit ground.
+- Interiors get a dark surround (no raw black void frame); phone vignette
+  softened and quest HUD compacted on small screens.
+- Phone navigation: modals scroll, pause menu fits the screen, all menu and
+  back buttons are finger-sized.
+- Android fullscreen immersion: status bar and nav buttons hidden (swipe
+  from an edge to reveal), notch edge-to-edge.
 - Android APK build via Capacitor + cloud workflow.
 - One-click release system (`release.bat`) with automatic Releases + APK.
 
