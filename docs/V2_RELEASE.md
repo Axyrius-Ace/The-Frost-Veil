@@ -1,15 +1,15 @@
 # Frost Veil V2
 
-## Android hotfix
+## Android performance pass
 
-- Removed the camera-sized RenderTexture lighting pass on touch/coarse-pointer devices. It was producing the broken black rectangle and hard seams visible after Android viewport compositing.
-- Kept flashlight aiming, occlusion checks, hidden-clue detection, and a lightweight flashlight cone on Android.
-- Capped Phaser renderer resolution at 1x and enabled rounded resize handling to avoid high-DPI framebuffer seams and reduce GPU memory use.
+- Reduced flashlight ray count on mobile while preserving occlusion and clue detection.
+- Reduced repeated nearby-wall scans used by the flashlight.
+- Avoided unnecessary fog TileSprite position and resize calls.
+- Lowered snowfall emission rate slightly to reduce particle and battery pressure.
+- Kept Phaser at 1x resolution to avoid oversized high-DPI framebuffers.
 
-## Build
+The V2 source is on `main`. Build the updated Android package with:
 
 ```bash
 npm run build:apk
 ```
-
-The generated Android project is updated by Capacitor sync. The final signed APK still needs to be assembled in Android Studio or with the local Gradle/Android SDK environment.
