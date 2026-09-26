@@ -12,7 +12,10 @@ export function createGame(parent: HTMLElement) {
     pixelArt: true,
     roundPixels: true,
     antialias: false,
-    scale: { mode: Phaser.Scale.RESIZE, width: parent.clientWidth || window.innerWidth, height: parent.clientHeight || window.innerHeight },
+    // Prevent high-DPI Android screens from creating oversized WebGL targets.
+    // This also removes the fractional compositing seams visible after resize.
+    resolution: 1,
+    scale: { mode: Phaser.Scale.RESIZE, autoRound: true, width: parent.clientWidth || window.innerWidth, height: parent.clientHeight || window.innerHeight },
     physics: { default: 'arcade', arcade: { debug: false } },
     audio: { noAudio: true },
     scene: [BootScene, TitleScene, GameScene],
