@@ -4,7 +4,10 @@ Every released version appears in the GitHub **Releases** list
 (next to all older ones), each with its own APK to download.
 
 ## Unreleased (on `main`)
-- Current V2 development.
+- Next development.
+
+## v3.0 — V3
+- Everything from V2 (touch joystick, landscape/rotation handling, Android build).
 - Fix: flashlight beam rendered from the post-physics player position, faster
   beam tracking while moving, and touch aim only while the finger is down —
   the light stays glued to the player instead of trailing behind.
