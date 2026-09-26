@@ -78,7 +78,12 @@ export class GameScene extends Phaser.Scene {
     this.input.mouse?.disableContextMenu();
 
     this.scale.on('resize', this.onResize, this);
-    this.events.once('shutdown', () => { this.scale.off('resize', this.onResize, this); this.input.keyboard?.removeAllKeys(false); });
+    this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.syncLight, this);
+    this.events.once('shutdown', () => {
+      this.scale.off('resize', this.onResize, this);
+      this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.syncLight, this);
+      this.input.keyboard?.removeAllKeys(false);
+    });
 
     this.setArea(s.area);
     this.onResize();
@@ -189,6 +194,36 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets: img, alpha: 0, duration: 26000, ease: 'Quad.in' });
   }
 
+  /* ------------------------------------------------- post-physics light sync */
+  /**
+   * Runs on POST_UPDATE, i.e. after the arcade body has integrated this
+   * frame's velocity. The beam origin, the darkness mask and the cone glow
+   * are all drawn from the exact player transform that gets rendered, so the
+   * light can never trail one step behind the sprite while walking/running.
+   */
+  private syncLight(time: number, delta: number) {
+    const dt = Math.min(delta, 50) / 1000;
+    if (!this.player || !this.lighting) return;
+    const px = this.player.x, py = this.player.y - 11;
+    let power = 1;
+    if (this.battery < 15) power = Math.random() < 0.07 ? 0.15 : 0.55 + this.battery / 34;
+    this.lighting.flash = { on: this.flashOn, x: px, y: py, angle: this.aim, range: FLASH_RANGE * (this.battery < 15 ? 0.78 : 1), half: FLASH_HALF_ANGLE, power };
+    this.lighting.aura.x = px; this.lighting.aura.y = py + 4;
+    this.lighting.update(time);
+
+    // Hidden things fade in only inside the beam
+    for (const it of this.interactables) {
+      if (!it.active || !it.hidden) continue;
+      const lit = this.lighting.isLit(it.x, it.y) > 0 ? 1 : 0;
+      it.reveal = Phaser.Math.Linear(it.reveal, lit, lit ? 6 * dt : 1.5 * dt);
+      it.sprite?.setAlpha(it.reveal);
+    }
+    for (const d of this.hiddenDecals) {
+      const lit = this.lighting.isLit(d.x, d.y) > 0 ? 0.95 : 0;
+      d.setAlpha(Phaser.Math.Linear(d.alpha, lit, lit ? 6 * dt : 1.5 * dt));
+    }
+  }
+
   /* ----------------------------------------------------------------- update */
   update(time: number, delta: number) {
     const dt = Math.min(delta, 50) / 1000;
@@ -223,15 +258,23 @@ export class GameScene extends Phaser.Scene {
       this.player.setFrame(`${this.facing}-0`);
     }
 
-    // Flashlight aim: mouse if recently moved, otherwise movement direction
+    // Flashlight aim: mouse if recently moved, otherwise movement direction.
+    // A touch only aims while the finger is held down on the canvas — once it
+    // lifts, the beam snaps back to the movement direction instead of sticking
+    // to the stale touch point while steering with the virtual joystick.
+    const ptr = this.input.activePointer;
+    if (ptr.isDown && ptr.wasTouch) this.lastPointerMove = time;
     const px = this.player.x, py = this.player.y - 11;
     let target = moving ? Math.atan2(vy, vx) : FACING_ANGLE[this.facing];
-    if (time - this.lastPointerMove < 3000) {
-      const wp = this.input.activePointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
+    if (time - this.lastPointerMove < 3000 && (!ptr.wasTouch || ptr.isDown)) {
+      const wp = ptr.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
       target = Math.atan2(wp.y - py, wp.x - px);
       if (!moving) { const a = Phaser.Math.Angle.Wrap(target); this.facing = Math.abs(a) < Math.PI / 4 ? 'right' : Math.abs(a) > (3 * Math.PI) / 4 ? 'left' : a > 0 ? 'down' : 'up'; this.player.setFrame(`${this.facing}-0`); }
     }
-    this.aim = Phaser.Math.Angle.RotateTo(this.aim, target, 7 * dt);
+    // Track fast enough that the beam stays glued to the sprite when turning:
+    // near-instant while moving, still smooth when following the mouse.
+    const rate = moving ? 18 : 12;
+    this.aim += Phaser.Math.Angle.Wrap(target - this.aim) * Math.min(1, dt * rate);
 
     if (playing && (Phaser.Input.Keyboard.JustDown(k.flash) || consumeFlash())) this.toggleFlash();
 
@@ -241,24 +284,6 @@ export class GameScene extends Phaser.Scene {
       if (this.battery <= 0) { this.flashOn = false; audio.flashlight(false); toast('The flashlight dies. The dark closes in.', 'warn'); setState({ flashlightOn: false }); }
     }
     if (Math.abs(this.battery - this.batterySynced) >= 0.5) { this.batterySynced = this.battery; setState({ battery: this.battery }); }
-
-    let power = 1;
-    if (this.battery < 15) power = Math.random() < 0.07 ? 0.15 : 0.55 + this.battery / 34;
-    this.lighting.flash = { on: this.flashOn, x: px, y: py, angle: this.aim, range: FLASH_RANGE * (this.battery < 15 ? 0.78 : 1), half: FLASH_HALF_ANGLE, power };
-    this.lighting.aura.x = px; this.lighting.aura.y = py + 4;
-    this.lighting.update(time);
-
-    // Hidden things fade in only inside the beam
-    for (const it of this.interactables) {
-      if (!it.active || !it.hidden) continue;
-      const lit = this.lighting.isLit(it.x, it.y) > 0 ? 1 : 0;
-      it.reveal = Phaser.Math.Linear(it.reveal, lit, lit ? 6 * dt : 1.5 * dt);
-      it.sprite?.setAlpha(it.reveal);
-    }
-    for (const d of this.hiddenDecals) {
-      const lit = this.lighting.isLit(d.x, d.y) > 0 ? 0.95 : 0;
-      d.setAlpha(Phaser.Math.Linear(d.alpha, lit, lit ? 6 * dt : 1.5 * dt));
-    }
 
     // Nearest interactable
     let best: Interactable | null = null; let bd = Infinity;

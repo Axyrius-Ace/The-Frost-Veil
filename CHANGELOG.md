@@ -5,6 +5,9 @@ Every released version appears in the GitHub **Releases** list
 
 ## Unreleased (on `main`)
 - Current V2 development.
+- Fix: flashlight beam rendered from the post-physics player position, faster
+  beam tracking while moving, and touch aim only while the finger is down —
+  the light stays glued to the player instead of trailing behind.
 
 ## v1.0 — V1 classic
 - Original PC version snapshot + mobile touch controls and rotation fix.
