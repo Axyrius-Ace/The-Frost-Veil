@@ -1,7 +1,7 @@
 {
   "name": "frost-veil",
   "private": true,
-  "version": "3.0.0",
+  "version": "2.0.0",
   "description": "FROST VEIL - a 2D pixel-art detective mystery set on an endless snowy night.",
   "type": "module",
   "scripts": {

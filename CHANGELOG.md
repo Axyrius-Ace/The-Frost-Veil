@@ -5,18 +5,16 @@ Every released version appears in the GitHub **Releases** list
 
 ## Unreleased (on `main`)
 - Next development.
-- Fix: virtual joystick listeners now attach when entering play mode (the
-  stick was visible but dead, so the player couldn't move on touch devices),
-  plus stick dead zone and second-finger guard.
-- Landscape: browser version requests landscape lock on game start and shows
-  a "rotate your phone" hint in portrait (the APK was already locked via
-  AndroidManifest).
 
-## v3.0 — V3
-- Everything from V2 (touch joystick, landscape/rotation handling, Android build).
-- Fix: flashlight beam rendered from the post-physics player position, faster
-  beam tracking while moving, and touch aim only while the finger is down —
-  the light stays glued to the player instead of trailing behind.
+## v2.0 — V2
+- Virtual joystick (listeners attach on entering play mode, dead zone,
+  second-finger guard) so the player moves on touch devices.
+- Landscape: browser version requests landscape lock on game start and shows
+  a "rotate your phone" hint in portrait; APK locked via AndroidManifest.
+- Flashlight beam rendered from the post-physics player position, faster
+  beam tracking while moving, touch aim only while the finger is down.
+- Android APK build via Capacitor + cloud workflow.
+- One-click release system (`release.bat`) with automatic Releases + APK.
 
 ## v1.0 — V1 classic
 - Original PC version snapshot + mobile touch controls and rotation fix.
