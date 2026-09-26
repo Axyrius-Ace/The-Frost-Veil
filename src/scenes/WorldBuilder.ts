@@ -23,11 +23,11 @@ export function buildWorld(sc: GameScene) {
     sc.add.image(b.x, b.y - (b.extraTop ?? 0), `bld-${b.id}`).setOrigin(0).setDepth(b.y + b.h);
     sc.addWall(b.x, b.y, b.w, b.h);
     L.addOccluder(b.x, b.y, b.w, b.h);
-    for (const wnd of b.litWindows ?? []) L.addLight({ x: wnd.x, y: wnd.y + 8, radius: 36, intensity: 0.55, color: 0xffa040, flicker: 0.004 });
+    for (const wnd of b.litWindows ?? []) L.addLight({ x: wnd.x, y: wnd.y + 8, radius: 36, intensity: 0.45, color: 0xffa040, flicker: 0.004 });
     if (b.door === undefined) continue;
     const dx = b.x + b.door, dy = b.y + b.h;
     if (b.enter) {
-      L.addLight({ x: dx, y: dy + 2, radius: 34, intensity: 0.6, color: 0xffc070, flicker: 0.01 });
+      L.addLight({ x: dx, y: dy + 2, radius: 34, intensity: 0.5, color: 0xffc070, flicker: 0.01 });
       const area = AREAS[b.enter];
       sc.addInteractable({ id: `door-${b.id}`, x: dx, y: dy + 4, r: 16, label: `Enter ${b.name}`, action: () => sc.travel(area.id, area.spawn!.x, area.spawn!.y, 'up') });
     } else if (b.locked) {
@@ -41,8 +41,8 @@ export function buildWorld(sc: GameScene) {
     sc.add.image(l.x, l.y, l.dead ? 'lamp-dead' : 'lamp').setOrigin(0.5, 1).setDepth(l.y);
     sc.addWall(l.x - 2, l.y - 3, 4, 3);
     if (!l.dead) {
-      L.addLight({ x: l.x, y: l.y - 4, radius: 78, intensity: 0.92, color: 0xffb060, flicker: l.flicker ?? 0.004 });
-      L.addLight({ x: l.x, y: l.y - 40, radius: 14, intensity: 0.9, color: 0xffd090, flicker: l.flicker ?? 0.004, glowScale: 1.6 });
+      L.addLight({ x: l.x, y: l.y - 4, radius: 60, intensity: 0.68, color: 0xffb060, flicker: l.flicker ?? 0.004 });
+      L.addLight({ x: l.x, y: l.y - 40, radius: 12, intensity: 0.65, color: 0xffd090, flicker: l.flicker ?? 0.004, glowScale: 1.6 });
     }
   }
 
@@ -116,6 +116,8 @@ export function buildWorld(sc: GameScene) {
   for (const a of Object.values(AREAS)) {
     if (!a.indoor) continue;
     const b = a.bounds;
+    // Dark surround so the camera never shows the raw black void around the room.
+    sc.add.rectangle(b.x - 500, b.y - 500, b.w + 1000, b.h + 1000, 0x060910).setOrigin(0).setDepth(DEPTH.GROUND - 1);
     sc.add.tileSprite(b.x, b.y, b.w, b.h, a.floor!).setOrigin(0).setDepth(DEPTH.GROUND);
     sc.add.tileSprite(b.x, b.y, b.w, 28, a.wall!).setOrigin(0).setDepth(b.y + 28);
     const dark = 0x07090f, gap = 14, cx = b.x + b.w / 2;
@@ -168,7 +170,7 @@ export function buildWorld(sc: GameScene) {
     sc.addWall(n.x - 5, n.y - 5, 10, 5);
     const name = CHARACTERS[n.id].name;
     sc.addInteractable({ id: `npc-${n.id}`, x: n.x, y: n.y + 2, r: 26, label: `Talk to ${name}`, action: () => sc.startDialogue(n.id) });
-    if (n.id === 'halvorsen') L.addLight({ x: n.x + 6, y: n.y - 6, radius: 30, intensity: 0.6, color: 0xffc070, flicker: 0.02 }); // his lantern
+    if (n.id === 'halvorsen') L.addLight({ x: n.x + 6, y: n.y - 6, radius: 30, intensity: 0.5, color: 0xffc070, flicker: 0.02 }); // his lantern
   }
 
   // ---- Batteries

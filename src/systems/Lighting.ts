@@ -38,7 +38,7 @@ export class Lighting {
   ambient = 0.9;
   ambientColor = 0x02050e;
   flash: Flashlight = { on: false, x: 0, y: 0, angle: 0, range: 150, half: 0.42, power: 1 };
-  aura = { x: 0, y: 0, radius: 30, alpha: 0.5 };
+  aura = { x: 0, y: 0, radius: 26, alpha: 0.32 };
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -87,7 +87,7 @@ export class Lighting {
         k *= on ? 1 : 0.04;
       }
       l.cur = k;
-      l.glow.setAlpha(0.24 * k);
+      l.glow.setAlpha(0.15 * k);
       if (l.x + l.radius < wv.x || l.x - l.radius > wv.right || l.y + l.radius < wv.y || l.y - l.radius > wv.bottom) continue;
       this.rt.stamp('light', undefined, l.x - ox, l.y - oy, { scale: l.radius / 64, alpha: Math.min(1, k), erase: true });
     }

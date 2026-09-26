@@ -51,7 +51,7 @@ export interface AreaDef {
 }
 
 export const AREAS: Record<string, AreaDef> = {
-  town: { id: 'town', name: 'Hollowpine', indoor: false, ambient: 0.9, bounds: { x: 0, y: 0, w: 1120, h: 800 } },
+  town: { id: 'town', name: 'Hollowpine', indoor: false, ambient: 0.95, bounds: { x: 0, y: 0, w: 1120, h: 800 } },
   post: { id: 'post', name: 'Post Office', indoor: true, ambient: 0.93, bounds: { x: 1300, y: 40, w: 300, h: 220 }, floor: 'floor-wood', wall: 'wall-post', exit: { x: 364, y: 312 } },
   clinic: { id: 'clinic', name: 'Brandt Clinic', indoor: true, ambient: 0.9, bounds: { x: 1700, y: 40, w: 320, h: 230 }, floor: 'floor-tile', wall: 'wall-clinic', exit: { x: 844, y: 316 } },
   inn: { id: 'inn', name: 'The Last Lantern', indoor: true, ambient: 0.88, bounds: { x: 1300, y: 400, w: 380, h: 260 }, floor: 'floor-wood', wall: 'wall-inn', exit: { x: 310, y: 598 } },

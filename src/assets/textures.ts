@@ -99,8 +99,8 @@ function genGround(scene: Phaser.Scene) {
     let r = 0, g = 0, b = 0; const k = cls[y * W + x];
     if (k === 0) {
       const v = (big - 0.5) * 10 + (huge - 0.5) * 12 + (n - 0.5) * 6;
-      r = 212 + v; g = 223 + v; b = 240 + v * 0.6;
-      if (n > 0.997) { r = 255; g = 255; b = 255; }
+      r = 184 + v; g = 197 + v; b = 216 + v * 0.6;
+      if (n > 0.997) { r = 235; g = 242; b = 250; }
     } else if (k === 1) {
       const v = (big - 0.5) * 8 + (n - 0.5) * 8; r = 112 + v; g = 122 + v; b = 146 + v;
       const inH = y >= hy.y && y < hy.y + hy.h, inV = x >= vx.x && x < vx.x + vx.w;

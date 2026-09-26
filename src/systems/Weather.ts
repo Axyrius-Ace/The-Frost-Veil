@@ -32,11 +32,11 @@ export class Weather {
     this.near = scene.add.particles(0, 0, 'flake-l', {
       emitZone: { type: 'random', source: zone(120) } as any,
       lifespan: { min: 1600, max: 3200 }, speedY: { min: 40, max: 80 }, speedX: { min: -70, max: -25 },
-      scale: { min: 0.8, max: 1.4 }, alpha: fade(0.35) as any, frequency: 28, quantity: 1,
+      scale: { min: 0.8, max: 1.4 }, alpha: fade(0.22) as any, frequency: 28, quantity: 1,
     }).setDepth(DEPTH.SNOW_TOP);
 
     this.fog = scene.add.tileSprite(0, 0, 640, 400, 'fog').setOrigin(0).setDepth(DEPTH.FOG).setAlpha(0.32);
-    this.fogTop = scene.add.tileSprite(0, 0, 640, 400, 'fog').setOrigin(0).setDepth(DEPTH.FOG_TOP).setAlpha(0.07).setTint(0x9fb6d8);
+    this.fogTop = scene.add.tileSprite(0, 0, 640, 400, 'fog').setOrigin(0).setDepth(DEPTH.FOG_TOP).setAlpha(0.05).setTint(0x9fb6d8);
   }
 
   setIndoor(indoor: boolean) {
