@@ -1,0 +1,51 @@
+name: Release
+
+# Every tag like v2.0 or v2.1 creates a new entry in the GitHub
+# Releases list (next to all older versions), with the APK attached.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Sync web assets to Android
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK with version
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk frost-veil-${{ github.ref_name }}.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: frost-veil-${{ github.ref_name }}.apk
+          generate_release_notes: true
